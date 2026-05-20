@@ -2,6 +2,8 @@ from typing import List
 from langchain_core.documents import Document
 
 from app.ai.chunking.chunk_service import ChunkService
+from app.ai.embeddings.base_embeding_service import BaseEmbeddingService
+from app.ai.embeddings.embedding_factory import EmbeddingFactory
 from app.ai.parsers.base_parser import BaseParser
 from app.ai.parsers.parser_factory import ParserFactory
 
@@ -50,6 +52,25 @@ class IngestionService:
             f"Chunking completed. "
             f"Total chunks: "
             f"{len(chunked_docs)}"
+        )
+
+        embedding_service: BaseEmbeddingService = (EmbeddingFactory.get_embedding_service(provider="openai"))
+
+        texts: List[str] = [chunk.page_content for chunk in chunked_docs]
+
+        embeddings: List[List[float]] = (await embedding_service.generate_embeddings(texts=texts))
+
+        logger.info(
+            f"{self.__class__.__name__} | "
+            f"Embedding generation completed successfully. "
+            f"Total embeddings: "
+            f"{len(embeddings)}"
+        )
+
+        logger.info(
+            f"{self.__class__.__name__} | "
+            f"Embedding dimension: "
+            f"{len(embeddings[0])}"
         )
 
         return chunked_docs
