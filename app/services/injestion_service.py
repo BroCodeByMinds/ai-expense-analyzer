@@ -7,6 +7,8 @@ from app.ai.embeddings.embedding_factory import EmbeddingFactory
 from app.ai.parsers.base_parser import BaseParser
 from app.ai.parsers.parser_factory import ParserFactory
 
+from app.ai.vectorstores.base_vector_store import BaseVectorStore
+from app.ai.vectorstores.vector_store_factory import VectorStoreFactory
 from app.utils.file_utils import get_file_extension
 from app.core.logging import setup_logger
 
@@ -71,6 +73,16 @@ class IngestionService:
             f"{self.__class__.__name__} | "
             f"Embedding dimension: "
             f"{len(embeddings[0])}"
+        )
+
+        store_service : BaseVectorStore = VectorStoreFactory.get_vector_store("chroma_db")
+
+        store_service.store_documents(documents=chunked_docs, embeddings=embeddings)
+
+        logger.info(
+            f"{self.__class__.__name__} | "
+            f"Documents stored successfully "
+            f"in vector database."
         )
 
         return chunked_docs
