@@ -15,22 +15,12 @@ class ChunkService:
         
     
     async def chunk_documents(self, documents: List[Document]) -> List[Document]:
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Starting document chunking. "
-            f"Total documents: {len(documents)}"
-        )
+        logger.info(f"{self.__class__.__name__} | Starting document chunking. Total documents: {len(documents)}")
 
         chunked_documents = self.text_splitter.split_documents(documents=documents)
 
         for index, chunk in enumerate(chunked_documents):
             chunk.metadata["chunk_index"] = index 
-        
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Starting document chunking. "
-            f"Total documents: {len(documents)}"
-        )
 
         return chunked_documents
             

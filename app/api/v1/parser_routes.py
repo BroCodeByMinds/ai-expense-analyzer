@@ -11,9 +11,7 @@ async def parse():
 
     documents = await (
         ingestion_service.parse_file(
-            file_path=(
-                "Acct Statement_7803_22042026_20.06.12_unlocked.pdf"
-            )
+            file_path=("C:\Gopal-Projects\Gen-AI\Account Statements\Acct Statement_7803_22042026_20.06.12_unlocked.pdf")
         )
     )
 

@@ -18,71 +18,32 @@ logger = setup_logger(__name__)
 class IngestionService:
 
     async def parse_file(self, file_path: str) -> List[Document]:
-
+        # Step 1: Identify the file type from the file extension
+        # Example: pdf, csv, xlsx
         file_type : str = get_file_extension(file_path)
 
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Starting document parsing. "
-            f"File path: {file_path}, "
-            f"File type: {file_type}"
-        )
-
+        # Step 2: Resolve the appropriate parser implementation
+        # using the factory pattern
         parser : BaseParser = ParserFactory.get_parser(file_type=file_type)
 
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Parser resolved successfully. "
-            f"Parser: {parser.__class__.__name__}"
-        )
-
+        # Step 3: Parse the source file and convert it into
+        # LangChain Document objects
         documents : List[Document] = await parser.parse(file_path=file_path)
 
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Document parsing completed successfully. "
-            f"Total documents parsed: "
-            f"{len(documents)}"
-        )
-
+        # Step 4: Split documents into smaller chunks suitable
+        # for embedding generation and semantic search
         chunk_service : ChunkService = ChunkService()
-
         chunked_docs : List[Document] = await chunk_service.chunk_documents(documents=documents)
 
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Chunking completed. "
-            f"Total chunks: "
-            f"{len(chunked_docs)}"
-        )
-
-        embedding_service: BaseEmbeddingService = (EmbeddingFactory.get_embedding_service(provider="openai"))
-
+        # Step 5: Generate embeddings for each chunk using
+        # the configured embedding provider
+        embedding_service: BaseEmbeddingService = EmbeddingFactory.get_embedding_service(provider="ollama")
         texts: List[str] = [chunk.page_content for chunk in chunked_docs]
+        embeddings: List[List[float]] = await embedding_service.generate_embeddings(texts=texts)
 
-        embeddings: List[List[float]] = (await embedding_service.generate_embeddings(texts=texts))
-
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Embedding generation completed successfully. "
-            f"Total embeddings: "
-            f"{len(embeddings)}"
-        )
-
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Embedding dimension: "
-            f"{len(embeddings[0])}"
-        )
-
+        # Step 6: Persist chunked documents, metadata, and
+        # embeddings into the configured vector database
         store_service : BaseVectorStore = VectorStoreFactory.get_vector_store("chroma_db")
-
-        store_service.store_documents(documents=chunked_docs, embeddings=embeddings)
-
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Documents stored successfully "
-            f"in vector database."
-        )
+        await store_service.store_documents(documents=chunked_docs, embeddings=embeddings)
 
         return chunked_docs

@@ -1,3 +1,25 @@
-/.env
-/.vscode
-/venv
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Chroma DB
+chroma_db/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -15,12 +15,7 @@ class ChromaService(BaseVectorStore):
 
     
     async def store_documents(self, documents, embeddings):
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Starting vector storage. "
-            f"Total documents: "
-            f"{len(documents)}"
-        )
+        logger.info(f"{self.__class__.__name__} | Starting vector storage. Total documents: {len(documents)}")
 
         ids = [f"doc_{index}" for index in range(len(documents))]
 
@@ -30,12 +25,9 @@ class ChromaService(BaseVectorStore):
 
         self.collection.add(
             ids=ids,
-            texts=texts,
+            documents=texts,
             embeddings=embeddings,
             metadatas=metadatas,
         )
 
-        logger.info(
-            f"{self.__class__.__name__} | "
-            f"Documents stored successfully in ChromaDB."
-        )
+        logger.info(f"{self.__class__.__name__} | Documents stored successfully in ChromaDB.")
