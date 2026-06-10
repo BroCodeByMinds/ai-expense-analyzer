@@ -16,14 +16,26 @@ class ChromaService(BaseVectorStore):
 
     
     async def store_documents(self, documents, embeddings):
+        """
+        Store document chunks, embeddings, and metadata in the
+        configured ChromaDB collection.
+        """
         logger.info(f"{self.__class__.__name__} | Starting vector storage. Total documents: {len(documents)}")
 
+        # Step 1: Generate unique identifiers for each
+        # document chunk to be stored in the vector database.
         ids = [f"doc_{index}" for index in range(len(documents))]
 
+        # Step 2: Extract the chunk content from the document
+        # objects for vector store persistence.
         texts : List[str] = [document.page_content for document in documents]
 
+        # Step 3: Extract document metadata to support
+        # filtering, traceability, and retrieval.
         metadatas = [document.metadata for document in documents]
 
+        # Step 4: Store document chunks, embeddings, and
+        # metadata in the configured ChromaDB collection.
         self.collection.add(
             ids=ids,
             documents=texts,

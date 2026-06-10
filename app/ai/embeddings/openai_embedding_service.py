@@ -11,17 +11,25 @@ class OpenAIEmbeddingService(BaseEmbeddingService):
 
     
     async def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+        """
+        Generate vector embeddings for the provided text inputs
+        using the configured embedding model.
+        """
         logger.info(
             f"{self.__class__.__name__} | "
             f"Starting embedding generation. "
             f"Total texts: {len(texts)}"
         )
 
-        embeddings = await self.embedding_model.aembed_documents(texts=texts)
+        # Step 1: Generate embeddings for the provided text
+        # inputs using the configured embedding model.
+        embeddings : list[list[float]] = await self.embedding_model.aembed_documents(texts=texts)
         logger.info(
             f"{self.__class__.__name__} | "
             f"Embedding generation completed."
         )
 
+        # Step 2: Return the generated embeddings for
+        # downstream vector storage and retrieval.
         return embeddings
     

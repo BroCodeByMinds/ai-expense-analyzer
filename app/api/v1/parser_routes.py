@@ -1,3 +1,6 @@
+from typing import List
+from xml.dom.minidom import Document
+
 from fastapi import APIRouter
 from app.ai.parsers.pdf_parser import PDFParser
 from app.services.injestion_service import IngestionService
@@ -9,11 +12,9 @@ router = APIRouter(prefix="/api/v1/parser", tags=["parser"])
 async def parse():
     ingestion_service = IngestionService()
 
-    documents = await (
-        ingestion_service.parse_file(
+    documents: List[Document] = await ingestion_service.parse_file(
             file_path=("C:\Gopal-Projects\Gen-AI\Account Statements\Acct Statement_7803_22042026_20.06.12_unlocked.pdf")
         )
-    )
 
     return {
         "total_documents": len(documents),
